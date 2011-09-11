@@ -3,7 +3,7 @@
 #
 # _______________|  noise : ambient Brown noise generator (cf. white noise).
 #
-#           Usage:  noise  [minutes=59]  [band-pass freq center=1786]
+#           Usage:  noise  [minutes=59]  [band-pass freq center=1786]  [wave]
 #                          ^minutes can be any non-zero integer.
 #
 #    Dependencies:  play (from sox package)
@@ -16,14 +16,18 @@
 #  heavy rainfall. We shall filter it through a band-pass, then add effects 
 #  to mellow the output for ambience.
 
-#  [ ] - could add volume oscillation (amplitude modulation) to simulate 
+#  [/] - could increase volume oscillation (amplitude modulation) to simulate 
 #           waves or breathing pattern -- but this could be too relaxing.
 #           Hear the free online services listed at the end of file.
 #           Our goal here is calm concentration in a noisy environment.
 
+
 #  CHANGE LOG  Code posted at https://gist.github.com/1209835
 #
 #  2011-09-11  Repeat use of one-minute segment to cut CPU usage by 95%.
+#                 Fix tremolo to give very slow wave oscillation in volume.
+#                 (Thanks to xguse for his gist at github.)
+#                 Constant volume introduces tension psychologically.
 #  2011-09-10  First version based on 2009 article by Tom Swiss, and
 #                 subsequent comments. See below for relevant portions.
 
@@ -40,9 +44,13 @@ minutes=${1:-'59'}
 repeats=$(( minutes - 1 ))
 center=${2:-'1786'}
 
+wave=${3:-'0.02'}
+#         ^increase for more volume oscillation, but suggest no higher than 0.20
+
 noise='brown'
 #     ^your choice: 'white', 'pink', 'brown', 'tpdf'
 #     where tpdf stands for Triangular Probability Density Function (cf. dither).
+#     N.B. - white and pink noise have higher frequencies than Brown.
 
 len='01:00'
 #   ^CONSTANT one minute. (Format for specifying time length is hh:mm:ss.frac) 
@@ -55,14 +63,13 @@ echo " ::  Please stand-by... sox will 'play' $noise noise for $minutes minutes.
 
 
 play --no-show-progress -c 2 --null synth $len  ${noise}noise  band -n $center 499 \
-     tremolo 20 .1  reverb 19  repeat $repeats
+     tremolo $wave 37  reverb 19  repeat $repeats
      
+#  #    Previously published one-line versions misused tremolo:
 #  play -c 2 --null synth $len brownnoise band -n 1800 1400 tremolo 500 .1 reverb 50
 #  play -c 2 --null synth $len brownnoise band -n 2500 4000 tremolo 20 .1 reverb 50
 #  play --null synth $len brownnoise band -n 1200 200 tremolo 20 .1 reverb 20
 #  play --null synth $len brownnoise band -n 1200 200 tremolo 20 .1
-#  #    ... TRIED these versions above.
-#  #    N.B. - whitenoise and pinknoise have higher frequencies.
 
 
 #            _____ ARGUMENTS explained via "man sox"
@@ -133,7 +140,8 @@ play --no-show-progress -c 2 --null synth $len  ${noise}noise  band -n $center 4
 #       tremolo speed [depth]
 #           Apply a tremolo (low frequency amplitude modulation) effect to
 #           the audio.  The tremolo frequency in Hz is given by speed, and
-#           the depth as a percentage by depth (default 40).
+#           the depth as a percentage by depth (default 40). Increasing
+#           the depth gives wider range between soft and loud volumes.
 
 
 #       reverb [-w|--wet-only] [reverberance (50%) [HF-damping (50%)
@@ -204,3 +212,4 @@ exit 0
 
 #           _____ References
 #  Re: Brown noise, see http://en.wikipedia.org/wiki/Brownian_noise
+
