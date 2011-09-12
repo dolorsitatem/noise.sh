@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-#              bash 4.1.5(1)     Linux Ubuntu 10.04           Date : 2011-09-11
+#              bash 4.1.5(1)     Linux Ubuntu 10.04           Date : 2011-09-12
 #
 # _______________|  noise : ambient Brown noise generator (cf. white noise).
 #
 #           Usage:  noise  [minutes=59]  [band-pass freq center=1786]  [wave]
-#                          ^minutes can be any non-zero integer.
+#                          ^minutes can be any positive integer.
 #
 #    Dependencies:  play (from sox package)
 
@@ -24,6 +24,7 @@
 
 #  CHANGE LOG  Code posted at https://gist.github.com/1209835
 #
+#  2011-09-12  Add end notes on the Cognitive Science aspects.
 #  2011-09-11  Repeat use of one-minute segment to cut CPU usage by 95%.
 #                 Fix tremolo to give very slow wave oscillation in volume.
 #                 (Thanks to xguse for his gist at github.)
@@ -62,14 +63,20 @@ len='01:00'
 echo " ::  Please stand-by... sox will 'play' $noise noise for $minutes minutes."
 
 
-play --no-show-progress -c 2 --null synth $len  ${noise}noise  band -n $center 499 \
-     tremolo $wave 37  reverb 19  repeat $repeats
+play --no-show-progress  -c 2  --null  synth  $len  ${noise}noise  \
+     band -n $center 499               \
+     tremolo $wave    37   reverb 19   \
+     repeat  $repeats
+
      
 #  #    Previously published one-line versions misused tremolo:
 #  play -c 2 --null synth $len brownnoise band -n 1800 1400 tremolo 500 .1 reverb 50
 #  play -c 2 --null synth $len brownnoise band -n 2500 4000 tremolo 20 .1 reverb 50
 #  play --null synth $len brownnoise band -n 1200 200 tremolo 20 .1 reverb 20
 #  play --null synth $len brownnoise band -n 1200 200 tremolo 20 .1
+
+#  #  Q:  Using rate "-r 44100" produces overblown output -- why?
+#  #      (even with --guard against clipping ;-)
 
 
 #            _____ ARGUMENTS explained via "man sox"
@@ -210,6 +217,88 @@ exit 0
 #       http://playnoise.com
 
 
-#           _____ References
+#  _______________ HOW WHITE NOISE WORKS by Saabira Chaudhuri
+#                  WSJ 31 Aug 2011
+#  http://online.wsj.com/article/SB10001424053111904199404576538274265089288.html
+#  
+#  What people think of as "white noise" may actually be pink noise or brown
+#  noise or any number of other colors.  Sound is associated with a color based
+#  on where it falls on an audio spectrum of high to low frequencies. White noise
+#  contains random sounds across all frequencies and "sounds very much like a
+#  hiss because everything is changing in every sample," says Daniel Ellis,
+#  associate professor of electrical engineering at Columbia University in New
+#  York.  Pink noise, on the other hand, blends some high and lower frequencies,
+#  so it sounds like a hiss with a low rumble, he adds. Brown noise shifts to the
+#  lower end of the spectrum and sounds like rumbling.
+#  
+#  The most effective noise at blocking out other sounds is white noise because
+#  it covers the largest range on the spectrum, says Andrew Catellier, an
+#  electronics engineer at the Boulder, Colo.-based National Telecommunications &
+#  Information Administration, which publishes a glossary of sounds' color
+#  classifications.  Distinguishing noises by their frequencies is a useful tool
+#  for scientists and engineers working on practical applications, such as
+#  building a cellphone system or an ultrasound machine.  Sound is classified by
+#  its audible frequencies and associated with a color based on where it falls on
+#  the spectrum of high to low frequencies. White noise is unique in that it's
+#  random and includes all frequencies -- akin to how white light has all the
+#  colors in the spectrum.
+#  
+#  Calling sounds like rain or thunder white noise is somewhat of a misnomer, but
+#  the makers of downloadable apps and sleep machines use the term anyway.  White
+#  noise and other soothing sounds, once mainly played on machines to aid
+#  nighttime sleep, are increasingly helping make daytime hours more serene.
+#  
+#  After HeavyDutyApps released an app called Sleep Pillow Ambiance to help
+#  people sleep, it quickly realized that many customers used it during the day
+#  as well. "The usage varies from people who need help concentrating while
+#  working in noisy environments, commuters who need a break from train noise and
+#  travelers that need a peaceful environment," says Benny Shaviv, chief
+#  executive of the Westchester, N.Y.-based company. The $1.99 app has had more
+#  than 1.6 million downloads, says Mr. Shaviv. "By January we were among the Top
+#  50 apps in the Healthcare and Fitness category in iTunes."
+#  
+#  Most popular are sounds from nature: rain, wind, waves crashing on the beach
+#  and crickets, Mr. Shaviv says. But the app also includes some unexpected
+#  sounds, such as cold drink with ice, brushing hair and horse running in field.
+#  Thunderstorm is the most popular downloaded noise.
+#  
+#  Developers of these apps say they frequently get requests for new sounds.
+#  Steven Jian, co-owner of Simply Noise, has received requests for the sound of
+#  passing cars and airport noises. Shaviv of HeavyDutyApps got a request for a
+#  sonar noise from a former sailor who served on a submarine.  Todd Moore,
+#  founder and CEO of TMSoft, the maker of an app called White Noise, says he
+#  created a hair-dryer sound at one woman's request. "She told me that she could
+#  not sleep without listening to it and that she had burned [out] six hair
+#  dryers over the years."
+#  
+#  One small study examined white noise in a classroom environment. The research,
+#  led by Goran Soderlund and Sverker Sikström of Stockholm University, looked at
+#  51 students at a secondary school in Norway and found that those who normally
+#  had difficulty paying attention performed better when white noise was added to
+#  the classroom. The findings were published last year in the journal Behavioral
+#  and Brain Functions.
+#  
+#  The authors theorized that white noise boosted neural activity, helping the
+#  brain work more efficiently. The study predicted that white noise could help
+#  children with attention deficit hyperactivity disorder (ADHD) learn to focus
+#  on schoolwork better.
+#  
+#  Daytime white-noise listeners say the sounds serve two main purposes: to block
+#  out distractions and lessen sounds that cause anxiety, such as sirens.
+#  "Certain types of noises can be relaxing," says Robert C. Fifer, director of
+#  audiology and speech language pathology at the University of Miami. White
+#  noise can be used to create a more relaxing working environment, masking
+#  sounds and promoting a sense of privacy, he says.
+
+
+#           _____ Other REFERENCES
+#
 #  Re: Brown noise, see http://en.wikipedia.org/wiki/Brownian_noise
+
+#  "The effects of background white noise on memory performance 
+#       in inattentive school children"
+#  Göran BW Söderlund1, Sverker Sikström, Jan M Loftesnes and EJ Sonuga-Barke
+#  Behavioral and Brain Functions 2010, 6:55 doi:10.1186/1744-9081-6-55
+#  Published: 29 September 2010 
+#  http://www.behavioralandbrainfunctions.com/content/6/1/55/abstract
 
