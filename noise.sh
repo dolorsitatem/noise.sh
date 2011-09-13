@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#              bash 4.1.5(1)     Linux Ubuntu 10.04           Date : 2011-09-13
+#              bash 4.1.5(1)     Linux Ubuntu 10.04           Date : 2011-09-14
 #
 # _______________|  noise : ambient Brown noise generator (cf. white noise).
 #
@@ -19,11 +19,14 @@
 #  [/] - could increase volume oscillation (amplitude modulation) to simulate 
 #           waves or breathing pattern -- but this could be too relaxing.
 #           Hear the free online services listed at the end of file.
-#           Our goal is to block out distractions for calm concentration.
+#
+#        Our goal is to block out distractions for calm concentration.
 
 
 #  CHANGE LOG  Code posted at https://gist.github.com/1209835
 #
+#  2011-09-14  Add volume amplification to compensate for effects previously 
+#                 applied. Use peak-level meter to avoid clipping.
 #  2011-09-13  Add bass and treble tone controls.
 #                 at loud volumes, low frequency thumping may be annoying, 
 #                 so reduce gain on bass. Treble can be used to reduce 
@@ -68,13 +71,23 @@ len='01:00'
 #     This dramatically cuts CPU usage by 95% after the first minute.
 
 
-echo " ::  Please stand-by... sox will 'play' $noise noise for $minutes minutes."
+#  For DEBUGGING: "noise 1" shows the peak-level meter; also instant production.
+if [ $minutes -eq 1 ] ; then
+     progress='--show-progress'
+else
+     progress='--no-show-progress'
+fi
 
 
-play --no-show-progress  -c 2  --null  synth  $len  ${noise}noise  \
+echo " ::  Please stand-by... sox will 'play' $noise noise for $minutes minute(s)."
+#          FYI  Channels: 2 @ 32-bit,  Samplerate: 48000Hz.
+
+
+play $progress  -c 2  --null  synth  $len  ${noise}noise  \
      band -n $center 499               \
      tremolo $wave    43   reverb 19   \
-     bass -9               treble +1   \
+     bass -11              treble -1   \
+     vol     14dB                      \
      repeat  $repeats
 
      
@@ -83,9 +96,6 @@ play --no-show-progress  -c 2  --null  synth  $len  ${noise}noise  \
 #  play -c 2 --null synth $len brownnoise band -n 2500 4000 tremolo 20 .1 reverb 50
 #  play --null synth $len brownnoise band -n 1200 200 tremolo 20 .1 reverb 20
 #  play --null synth $len brownnoise band -n 1200 200 tremolo 20 .1
-
-#  #  Q:  Using rate "-r 44100" produces overblown output -- why?
-#  #      (even with --guard against clipping ;-)
 
 
 #            _____ ARGUMENTS explained via "man sox"
@@ -179,6 +189,21 @@ play --no-show-progress  -c 2  --null  synth  $len  ${noise}noise  \
 #           case of brownnoise with effects. Reduce annoyance accordingly.
 
 
+#       vol gain 
+#           Apply an amplification or an attenuation to the audio signal.
+#           Unlike the -v option (which is used for balancing multiple
+#           input files as they enter the SoX effects processing chain),
+#           vol is an effect like any other so can be applied anywhere,
+#           and several times if necessary, during the processing chain.
+#  
+#           The amount to change the volume is given by gain which is
+#           interpreted, according to the given type, as follows: 
+#           if dB, then a power change in dB.  When type is dB, a gain 
+#           of 0 leaves the volume unchanged, less than 0 decreases it, 
+#           and greater than 0 increases it.
+#           Beware of clipping when the increasing the volume.
+
+
 #       repeat count
 #           Repeat the entire audio count times.  Requires temporary file
 #           space to store the audio to be repeated. [But where exactly?] 
@@ -233,8 +258,9 @@ exit 0
 #           _____ Free ONLINE alternatives
 #
 #  Simply Noise for white, pink and brown/red noise generator; uses Flash:
-#       http://simplynoise.com   $0.99 app available
-#  [Flash consumes about 30 times more than our script in CPU usage!]
+#       http://simplynoise.com   (App is $0.99) 
+#
+#       [Flash consumes about 30 times more than our script in CPU usage!]
 #
 #  PlayNoise for white, pink, and brown noise generator; uses Javascript/HTML5:
 #       http://playnoise.com
@@ -294,6 +320,13 @@ exit 0
 #  not sleep without listening to it and that she had burned [out] six hair
 #  dryers over the years."
 #  
+#  Daytime white-noise listeners say the sounds serve two main purposes: to block
+#  out distractions and lessen sounds that cause anxiety, such as sirens.
+#  "Certain types of noises can be relaxing," says Robert C. Fifer, director of
+#  audiology and speech language pathology at the University of Miami. White
+#  noise can be used to create a more relaxing working environment, masking
+#  sounds and promoting a sense of privacy, he says.
+#  
 #  One small study examined white noise in a classroom environment. The research,
 #  led by Goran Soderlund and Sverker Sikström of Stockholm University, looked at
 #  51 students at a secondary school in Norway and found that those who normally
@@ -305,23 +338,17 @@ exit 0
 #  brain work more efficiently. The study predicted that white noise could help
 #  children with attention deficit hyperactivity disorder (ADHD) learn to focus
 #  on schoolwork better.
-#  
-#  Daytime white-noise listeners say the sounds serve two main purposes: to block
-#  out distractions and lessen sounds that cause anxiety, such as sirens.
-#  "Certain types of noises can be relaxing," says Robert C. Fifer, director of
-#  audiology and speech language pathology at the University of Miami. White
-#  noise can be used to create a more relaxing working environment, masking
-#  sounds and promoting a sense of privacy, he says.
 
-
-#           _____ Other REFERENCES
+#           _____ REFERENCES
 #
-#  Re: Brown noise, see http://en.wikipedia.org/wiki/Brownian_noise
-
 #  "The effects of background white noise on memory performance 
 #       in inattentive school children"
 #  Göran BW Söderlund1, Sverker Sikström, Jan M Loftesnes and EJ Sonuga-Barke
 #  Behavioral and Brain Functions 2010, 6:55 doi:10.1186/1744-9081-6-55
 #  Published: 29 September 2010 
 #  http://www.behavioralandbrainfunctions.com/content/6/1/55/abstract
+
+
+#  Re: Brown noise, see http://en.wikipedia.org/wiki/Brownian_noise
+
 
