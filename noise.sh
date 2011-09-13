@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#              bash 4.1.5(1)     Linux Ubuntu 10.04           Date : 2011-09-12
+#              bash 4.1.5(1)     Linux Ubuntu 10.04           Date : 2011-09-13
 #
 # _______________|  noise : ambient Brown noise generator (cf. white noise).
 #
@@ -19,11 +19,17 @@
 #  [/] - could increase volume oscillation (amplitude modulation) to simulate 
 #           waves or breathing pattern -- but this could be too relaxing.
 #           Hear the free online services listed at the end of file.
-#           Our goal here is calm concentration in a noisy environment.
+#           Our goal is to block out distractions for calm concentration.
 
 
 #  CHANGE LOG  Code posted at https://gist.github.com/1209835
 #
+#  2011-09-13  Add bass and treble tone controls.
+#                 at loud volumes, low frequency thumping may be annoying, 
+#                 so reduce gain on bass. Treble can be used to reduce 
+#                 harshness from the high frequencies.
+#                 Adjust default wave for tremolo to perfectly cycle 
+#                 within the one-minute sample.
 #  2011-09-12  Add end notes on the Cognitive Science aspects.
 #  2011-09-11  Repeat use of one-minute segment to cut CPU usage by 95%.
 #                 Fix tremolo to give very slow wave oscillation in volume.
@@ -45,8 +51,10 @@ minutes=${1:-'59'}
 repeats=$(( minutes - 1 ))
 center=${2:-'1786'}
 
-wave=${3:-'0.02'}
+wave=${3:-'0.0333333'}
 #         ^increase for more volume oscillation, but suggest no higher than 0.20
+#          (and no lower than 0.0166667). Its value should consider the 60
+#          seconds duration of the repeated sample.
 
 noise='brown'
 #     ^your choice: 'white', 'pink', 'brown', 'tpdf'
@@ -65,7 +73,8 @@ echo " ::  Please stand-by... sox will 'play' $noise noise for $minutes minutes.
 
 play --no-show-progress  -c 2  --null  synth  $len  ${noise}noise  \
      band -n $center 499               \
-     tremolo $wave    37   reverb 19   \
+     tremolo $wave    43   reverb 19   \
+     bass -9               treble +1   \
      repeat  $repeats
 
      
@@ -127,19 +136,19 @@ play --no-show-progress  -c 2  --null  synth  $len  ${noise}noise  \
 #
 #  Consider this for centering the band-pass...
 #  
-#  Freq (Hz)      Octave      Description
-#  16   to   32   1st         Human threshold, the lowest pedal notes 
-#                                of a pipe organ.
-#  32   to  512   2nd to 5th  Rhythm frequencies, where the lower and upper 
-#                                bass notes lie.
-#  512  to 2048   6th to 7th  Defines human speech intelligibility, gives a 
-#                                horn-like or tinny quality to sound.
-#  2048 to 8192   8th to 9th  Gives presence to speech, where labial and 
-#                                fricative sounds lie.
-#  8192 to 16384  10th        Brilliance, the sounds of bells and the ringing 
-#                                of cymbals. In speech, the sound of 
-#                                the letter "S" (8000-11000 Hz)
-#        Source:  http://en.wikipedia.org/wiki/Audio_frequency
+#         Freq (Hz)    Octave      Description
+#         16 to   32   1st         Human threshold, the lowest pedal 
+#                                     notes of a pipe organ.
+#         32 to  512   2nd to 5th  Rhythm frequencies, where the lower 
+#                                     and upper bass notes lie.
+#        512 to 2048   6th to 7th  Defines human speech intelligibility, 
+#                                     horn-like or tinny sound quality.
+#       2048 to 8192   8th to 9th  Gives presence to speech, where labial 
+#                                     and fricative sounds lie.
+#       8192 to 16384  10th        Brilliance, the sounds of bells and the
+#                                     ringing of cymbals. In speech, sound
+#                                     of letter "S" (8000-11000 Hz)
+#            http://en.wikipedia.org/wiki/Audio_frequency
 #
 #  Avoid the really low frequencies which will produce disturbing rumble.
 
@@ -154,6 +163,20 @@ play --no-show-progress  -c 2  --null  synth  $len  ${noise}noise  \
 #       reverb [-w|--wet-only] [reverberance (50%) [HF-damping (50%)
 #           [room-scale (100%) [stereo-depth (100%)
 #           [pre-delay (0ms) [wet-gain (0dB)]]]]]]
+
+
+#       bass|treble gain 
+#           Boost or cut the bass (lower) or treble (upper) frequencies of
+#           the audio using a two-pole shelving filter with a response
+#           similar to that of a standard hi-fi's tone-controls.  This is
+#           also known as shelving equalisation (EQ).
+#           gain gives the gain at 0 Hz (for bass), or whichever is the
+#           lower of ∼22 kHz and the Nyquist frequency (for treble).  Its
+#           useful range is about -20 (for a large cut) to +20 (for a
+#           large boost).  Beware of clipping when using a positive gain.
+#
+#           When played loud, you may hear thumping bass lines in the 
+#           case of brownnoise with effects. Reduce annoyance accordingly.
 
 
 #       repeat count
