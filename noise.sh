@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-#              bash 4.1.5(1)     Linux Ubuntu 10.04           Date : 2011-09-14
+#              bash 4.1.5(1)     Linux Ubuntu 10.04           Date : 2011-10-04
 #
 # _______________|  noise : ambient Brown noise generator (cf. white noise).
 #
 #           Usage:  noise  [minutes=59]  [band-pass freq center=1786]  [wave]
 #                          ^minutes can be any positive integer.
+#                           Command "noise 1" will display peak-level meter.
 #
 #    Dependencies:  play (from sox package)
 
@@ -16,14 +17,14 @@
 #  heavy rainfall. We shall filter it through a band-pass, then add effects 
 #  to mellow the output for ambience.
 
-#  [/] - could increase volume oscillation (amplitude modulation) to simulate 
-#           waves or breathing pattern -- but this could be too relaxing.
-#           Hear the free online services listed at the end of file.
+#  Volume oscillation (amplitude modulation) is used to simulate artificially 
+#  long ocean waves. Try some of the free online services listed at the end 
+#  of this file to hear other types of oscillation.
 #
 #        Our goal is to block out distractions for calm concentration.
 
 
-#  CHANGE LOG  Code posted at https://gist.github.com/1209835
+#  CHANGE LOG  get LATEST version from https://bitbucket.org/rsvp/gists/src
 #
 #  2011-09-14  Add volume amplification to compensate for effects previously 
 #                 applied. Use peak-level meter to avoid clipping.
@@ -38,6 +39,7 @@
 #                 Fix tremolo to give very slow wave oscillation in volume.
 #                 (Thanks to xguse for his gist at github.)
 #                 Constant volume introduces tension psychologically.
+#                 Code posted at https://gist.github.com/1209835
 #  2011-09-10  First version based on 2009 article by Tom Swiss, and
 #                 subsequent comments. See below for relevant portions.
 
@@ -264,6 +266,12 @@ exit 0
 #
 #  PlayNoise for white, pink, and brown noise generator; uses Javascript/HTML5:
 #       http://playnoise.com
+#
+#  Random.org has 33-second sample audio files containing perfect white noise. 
+#       The randomness comes from atmospheric noise, which is more natural 
+#       than the pseudo-random number algorithms. Such files could serve as 
+#       input to sox for further signal processing.
+#       http://www.random.org/audio-noise/
 
 
 #  _______________ HOW WHITE NOISE WORKS by Saabira Chaudhuri
@@ -296,6 +304,8 @@ exit 0
 #  the makers of downloadable apps and sleep machines use the term anyway.  White
 #  noise and other soothing sounds, once mainly played on machines to aid
 #  nighttime sleep, are increasingly helping make daytime hours more serene.
+#  [White noise is a common synthetic noise source used for sound masking by 
+#  a tinnitus masker.]
 #  
 #  After HeavyDutyApps released an app called Sleep Pillow Ambiance to help
 #  people sleep, it quickly realized that many customers used it during the day
@@ -350,5 +360,4 @@ exit 0
 
 
 #  Re: Brown noise, see http://en.wikipedia.org/wiki/Brownian_noise
-
 
