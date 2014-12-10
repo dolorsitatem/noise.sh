@@ -66,6 +66,8 @@ noise='brown'
 #     where tpdf stands for Triangular Probability Density Function (cf. dither).
 #     N.B. - white and pink noise have higher frequencies than Brown.
 
+volume='1'
+
 len='01:00'
 #   ^CONSTANT one minute. (Format for specifying time length is hh:mm:ss.frac) 
 #     ___ATTN___ We first pre-compute one minute of audio output to file, 
@@ -102,10 +104,13 @@ HELPTEXT="
 	
 	noise		your choice: 'white', 'pink', 'brown', 'tpdf'
 			where tpdf stands for Triangular Probability Density Function (cf. dither).
-			N.B. - white and pink noise have higher frequencies than Brown."
+			N.B. - white and pink noise have higher frequencies than Brown.
 
+	volume		less than 0 decreases the volume, more than 0 increases it. Be careful: 
+			increasing this may cause clipping.
+"
 
-while getopts 'm:c:w:n:' OPTION
+while getopts 'm:c:w:n:v:' OPTION
 	do
 		case $OPTION in
 			m)	minutes="$OPTARG"
@@ -116,7 +121,9 @@ while getopts 'm:c:w:n:' OPTION
 				;;
 			n)	noise="$OPTARG"
 				;;
-			?)	printf "Usage: %s: [-m minutes <$minutes>] [-c center <$center>] [-w wave <$wave>] [-n noise <$noise>]\n${HELPTEXT}" $(basename $0)
+			v)	volume="$OPTARG"
+				;;
+			?)	printf "Usage: %s: [-m minutes <$minutes>] [-c center <$center>] [-w wave <$wave>] [-n noise <$noise>] [-v volume <$volume>]\n${HELPTEXT}" $(basename $0)
 				exit 2
 				;;
 		esac
@@ -131,6 +138,7 @@ play $progress  -c 2  --null  synth  $len  ${noise}noise  \
      tremolo $wave    43   reverb 19   \
      bass -11              treble -1   \
      vol     14dB                      \
+     vol     $volume                   \
      repeat  $repeats
 
      
