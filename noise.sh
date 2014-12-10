@@ -44,7 +44,7 @@
 #                 subsequent comments. See below for relevant portions.
 
 #           _____ Prelims
-set -u
+# set -u
 #   ^ unbound (i.e. unassigned) variables shall be errors.
 #           Example of default assignment:    arg1=${1:-'foo'}
 set -e
@@ -52,11 +52,11 @@ set -e
 #
 # _______________     ::  BEGIN  Script ::::::::::::::::::::::::::::::::::::::::
 
-minutes=${1:-'59'}
+minutes='60'
 repeats=$(( minutes - 1 ))
-center=${2:-'1786'}
+center='1786'
 
-wave=${3:-'0.0333333'}
+wave='0.0333333'
 #         ^increase for more volume oscillation, but suggest no higher than 0.20
 #          (and no lower than 0.0166667). Its value should consider the 60
 #          seconds duration of the repeated sample.
@@ -80,6 +80,47 @@ else
      progress='--no-show-progress'
 fi
 
+
+HELPTEXT="
+	minutes		length of time to play the noise
+	
+	center		Apply a band-pass filter.  The frequency response drops
+			logarithmically around the center frequency.  The width
+			parameter gives the slope of the drop.  The frequencies at
+			center + width and center - width will be half of their
+			original amplitudes.  band defaults to a mode oriented to
+			pitched audio, i.e. voice, singing, or instrumental music.
+			The -n (for noise) option uses the alternate mode for un-
+			pitched audio (e.g. percussion).  Warning: -n introduces a
+			power-gain of about 11dB in the filter, so beware of output
+			clipping.  band introduces noise in the shape of the filter,
+			i.e. peaking at the center frequency and settling around it
+	
+	wave		increase for more volume oscillation, but suggest no higher than 0.20
+			(and no lower than 0.0166667). Its value should consider the 60
+			seconds duration of the repeated sample.
+	
+	noise		your choice: 'white', 'pink', 'brown', 'tpdf'
+			where tpdf stands for Triangular Probability Density Function (cf. dither).
+			N.B. - white and pink noise have higher frequencies than Brown."
+
+
+while getopts 'm:c:w:n:' OPTION
+	do
+		case $OPTION in
+			m)	minutes="$OPTARG"
+				;;
+			c)	center="$OPTARG"
+				;;
+			w)	wave="$OPTARG"
+				;;
+			n)	noise="$OPTARG"
+				;;
+			?)	printf "Usage: %s: [-m minutes <$minutes>] [-c center <$center>] [-w wave <$wave>] [-n noise <$noise>]\n${HELPTEXT}" $(basename $0)
+				exit 2
+				;;
+		esac
+	done
 
 echo " ::  Please stand-by... sox will 'play' $noise noise for $minutes minute(s)."
 #          FYI  Channels: 2 @ 32-bit,  Samplerate: 48000Hz.
